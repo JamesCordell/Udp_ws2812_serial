@@ -296,7 +296,10 @@ void setup() {
   //Serial.println(success ? "success" : "failed");
 }
 
+short int id=0;
+char* mode;
 int r=0,g=0,b=0;
+
 
 void loop() {
 
@@ -309,9 +312,9 @@ void loop() {
       msg[len]=0;
 
       char* sub = msg;
-      short int id = atoi(strtok(sub,":"));
+      id = atoi(strtok(sub,":"));
 
-      char* mode = strtok(NULL,":");
+      mode = strtok(NULL,":");
       r = atoi(strtok(NULL,":"));
       g = atoi(strtok(NULL,":"));
       b = atoi(strtok(NULL,":"));
@@ -323,7 +326,7 @@ void loop() {
          showColor(r, g, b); //  
         }
         if ( strcmp(mode,"rainbowCycle") == 0 ) {
-        rainbowCycle(r,g,b);
+         rainbowCycle(r,g,b);
         }
       } else { //pass message onwards not for us.
          String st = "";
@@ -347,8 +350,20 @@ void loop() {
     do {
         success = udp.beginPacket(udp.remoteIP(),udp.remotePort());
     } while (!success);
-
-    success = udp.println("hello world from arduino");
+      
+      if ( strcmp(mode,"getStatus") == 0 ) {
+      String cc = ""; //current colour
+      cc += id;
+      cc += ":";
+      cc += mode;
+      cc += ":";
+      cc += r;
+      cc += ":";
+      cc += g;
+      cc += ":";
+      cc += b;
+      success = udp.println(cc);
+      }
 
     //Serial.print("bytes written: ");
     //Serial.println(success);
