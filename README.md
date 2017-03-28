@@ -1,7 +1,7 @@
 # Udp_ws2812_serial
 This project combinds the ethernt enc28j60 and the ws2812 led pixel lib to create a network for house lighting.
 
-The master Arduino sketch will accept commands over Ethernet. This can be done using netcat. The following command will control a string of lights connected to PIN number defined in the sketch. The netcat command is sending a udp raw udb packet over the ethernet. I used a server to do this. The string is built around the following.
+The master Arduino sketch will accept commands over Ethernet. This can be done using netcat to send the control signal. The following command will control a string of lights connected to PIN number defined in the sketch. The netcat command is sending a raw udp packet over the ethernet. I used a linux box to do this. The string is built around the following.
 
 
 	"echo -n "0:showColor:0:100:100" | nc -4u -w1 192.168.0.6 5000"
