@@ -16,6 +16,7 @@
  
 #include <UIPEthernet.h>
 #include <util/delay.h>
+#include <EEPROM.h>
 
 #ifdef __AVR__
   #include <avr/power.h>
@@ -192,6 +193,13 @@ void showColor( unsigned char r , unsigned char g , unsigned char b ) {
   
 }
 
+void saveColor( unsigned char r , unsigned char g , unsigned char b ) {
+  
+  EEPROM.write(0,r);
+  EEPROM.write(1,g);
+  EEPROM.write(2,b);
+}
+
 // Fill the dots one after the other with a color
 // rewrite to lift the compare out of the loop
 void colorWipe(unsigned char r , unsigned char g, unsigned char b, unsigned  char wait ) {
@@ -276,6 +284,7 @@ void rainbowCycle(unsigned int frames , unsigned int frameAdvance, unsigned int 
 //############################################################################
 
 EthernetUDP udp;
+int r=0,g=0,b=0;
 
 void setup() {
   
@@ -289,8 +298,20 @@ void setup() {
   
   ledsetup();
   
-  for (int i =0,b=0;i < 64;++i,++b) {
-   showColor(i,i,b/4);//slight yellow tinge from on.
+  if ( EEPROM.read(3) == 1 ) {//restore from previous save
+    r = EEPROM.read(0);
+    g = EEPROM.read(1);
+    b = EEPROM.read(2);
+  } else {//initial white default...
+   r = 64;
+   g = 64;
+   b = 64;
+   EEPROM.write(3,0);//set bit flag use to trigger restore colour on boot.
+  }
+  
+  for (int i =255;i > 1;--i) {
+    int 
+   showColor(r/i,g/i,b/4);//slight yellow tinge from on.
   delay(15); 
   }
   //Serial.println(success ? "success" : "failed");
@@ -298,8 +319,6 @@ void setup() {
 
 short int id=0;
 char* mode;
-int r=0,g=0,b=0;
-
 
 void loop() {
 
@@ -324,6 +343,10 @@ void loop() {
         }
         if ( strcmp(mode,"showColor") == 0 ) {
          showColor(r, g, b); //  
+        }
+        if ( strcmp(mode,"saveColor") == 0 ) {
+         saveColor(r, g, b); // 
+	 EEPROM.write(3,1);//set bit flag use to trigger restore colour on boot.
         }
         if ( strcmp(mode,"rainbowCycle") == 0 ) {
          rainbowCycle(r,g,b);
